@@ -1,0 +1,61 @@
+import os
+
+os.system("clear")
+# nombres = []
+# numeros = []
+# for x in range(4):
+#     nombre = input("Ingrese nombre\n")
+#     nombres.append(nombre)
+    
+# print(nombres)
+
+# Ingresar numero pares y se sumaran 1, dando resultado un numero impar, pero si se ingresa un numero impar, el programa terminará
+# numeros =[]
+# numero = 0
+# while numero %2==0:
+#     numero = int(input("Ingrese numero:\n"))
+#     if numero %2==0: #con este if se asegura que si se ingresa un numero impar, este no se guarde en la lista
+#         numeroMasUno = numero +1
+#         numeros.append(numeroMasUno)
+# print(numeros)
+
+
+# nombre.insert(0, 'PHP')
+
+# TERMINA AL ENCONTRAR LA LETRA CONDICIONADA E IMPRIME TODO LO ANTERIOIR A ESA LETRA
+# texto = "OpenEDG Python Institute"
+# for letter in texto:
+#     if letter == "n":
+#         break
+#     print(letter, end="")
+
+# #ELIMINA VOCALES DE UNA PALABRA, E IMPRIME TODO LO QUE NO ES VOCAL
+# text = "murcielago"
+# for letter in text:
+#     if letter == "a" or letter == "e" or letter == "i" or letter == "o" or letter == "u":
+#         continue
+#     print(letter, end="")
+
+# n = 0
+ 
+# while n != 3:
+#     print(n)
+#     n += 1
+# else:
+#     print(n, "else")
+ 
+# print()
+ 
+# for i in range(0, 3):
+#     print(i)
+# else:
+#     print(i, "else")
+
+for i in range(3):
+    print(i, end=" ")  # output: 0 1 2
+
+print("hola")
+
+for i in range(6, 1, -2):
+    print(i, end=" ")  # output: 6, 4, 2
+
