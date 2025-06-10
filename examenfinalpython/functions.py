@@ -1,122 +1,192 @@
-import time, os, random, csv
+import os
+import random
+import csv
+
+# Lista global para almacenar los datos de los estudiantes
 estudiantes = []
 
 
-#funcion para obtener id (validamos que venga AB o AM)
-def obtener_id():
-    grado = input("ingrese grado academico 'basica o media'\n").lower()
-    while grado not in ['basica', 'media']:
-        grado = input("ingrese grado academico 'basica o media'\n").lower()
-    if grado == 'basica':
-        grado_corto = 'AB'
+def limpiar_pantalla():
+    """Limpia la pantalla de la consola, compatible con Windows, Mac y Linux."""
+    if os.name == 'nt':
+        os.system('cls')  # Para Windows
     else:
-        grado_corto = 'AM'
+        os.system('clear')  # Para Mac y Linux
+
+
+def obtener_id():
+    """Obtiene, valida y asegura que un ID de estudiante sea único."""
+    while True:
+        grado = input("Ingrese grado académico ('basica' o 'media'):\n").lower()
+        if grado in ['basica', 'media']:
+            break
+        print("Grado no válido. Intente de nuevo.")
+
+    grado_corto = 'AB' if grado == 'basica' else 'AM'
+
     while True:
         try:
-            id_alumno = int(input("ingrese id\n"))
-            break
-        except:
-            print("opcion ingresada no es valida")
-    #ya tengo AB O AM y tengo el id
-    id_str = str(id_alumno)
-    id_final = id_str+ "-" + grado_corto
-    return id_final
+            id_numero_str = input("Ingrese el número de ID del alumno:\n")
+            id_numero = int(id_numero_str)
+            if id_numero <= 0:
+                print("El ID debe ser un número positivo.")
+                continue
+        except ValueError:
+            print("Entrada no válida. Por favor, ingrese un número.")
+            continue
+
+        id_final = id_numero_str + "-" + grado_corto
+
+        id_ya_existe = False
+        for estudiante in estudiantes:
+            if estudiante[0] == id_final:
+                id_ya_existe = True
+                break
+
+        if not id_ya_existe:
+            return id_final
+        else:
+            print(f"ERROR: El ID '{id_final}' ya está registrado.")
+            print("Por favor, ingrese un número de ID diferente.")
+
 
 def obtener_nombre():
-    nombre = input("ingrese nombre completo de alumno\n")
-    while len(nombre) < 5:
-        nombre = input("ingrese nombre completo de alumno\n")
-    return nombre
+    """Obtiene y valida el nombre completo del estudiante."""
+    while True:
+        nombre = input("Ingrese nombre completo del alumno:\n")
+        if len(nombre) >= 5 and ' ' in nombre.strip():
+            return nombre.title()
+        print("Nombre inválido. Debe tener al menos 5 caracteres y un espacio.")
+
 
 def obtener_edad():
-    edad = int(input("ingrese edad de alumno\n"))
-    while edad < 12 or edad > 18:
-        edad = int(input("ingrese edad de alumno (12 a 18)\n"))
-    return edad
+    """Obtiene y valida la edad del estudiante (entre 12 y 18)."""
+    while True:
+        try:
+            edad = int(input("Ingrese edad del alumno (entre 12 y 18):\n"))
+            if 12 <= edad <= 18:
+                return edad
+            else:
+                print("La edad debe estar entre 12 y 18 años.")
+        except ValueError:
+            print("Entrada no válida. Por favor, ingrese un número.")
+
 
 def registrar_estudiante():
+    """Registra uno o más estudiantes en la lista global."""
+    limpiar_pantalla()
     while True:
+        print("\n--- Registro de Nuevo Estudiante ---")
         id_estudiante = obtener_id()
         nombre_estudiante = obtener_nombre()
         edad_estudiante = obtener_edad()
+
         estudiante = [id_estudiante, nombre_estudiante, edad_estudiante]
         estudiantes.append(estudiante)
-        otro = input("desea agregar otro estudiante?   'si o no'\n").lower()
-        if otro == 'si':
-            continue
-        else:
+        print(f"\n¡Estudiante '{nombre_estudiante}' registrado con éxito!")
+
+        otro = input("¿Desea agregar otro estudiante? ('si' o 'no'):\n").lower()
+        if otro != 'si':
             break
-        
+        limpiar_pantalla()
+
+
 def mostrar_estudiante():
-    id_buscar = input("ingrese ID a buscar\n")
-    encontrado = False  # 1. Creamos la bandera y la iniciamos en False
+    """Busca un estudiante por ID y muestra sus datos básicos."""
+    limpiar_pantalla()
+    if not estudiantes:
+        print("No hay estudiantes registrados.")
+        input("\nPresione Enter para continuar...")
+        return
+
+    id_buscar = input("Ingrese ID a buscar:\n")
+    encontrado = False
 
     for estudiante in estudiantes:
         if id_buscar == estudiante[0]:
-            print(f"ID: {estudiante[0]}")
+            print("\n--- Datos del Estudiante ---")
+            print(f"ID:     {estudiante[0]}")
             print(f"NOMBRE: {estudiante[1]}")
-            print(f"EDAD: {estudiante[2]}")
-            encontrado = True  # 2. Si lo encontramos, cambiamos la bandera a True
-            break             # 3. Y salimos del bucle, ya no hay que buscar más
+            print(f"EDAD:   {estudiante[2]}")
+            encontrado = True
+            break
 
-    # 4. DESPUÉS del bucle, revisamos la bandera
-    if not encontrado:  # Esto es lo mismo que "if encontrado == False"
+    if not encontrado:
         print("Según nuestros registros, el estudiante no existe.")
 
-    # El input va FUERA del bucle, para que solo se pida una vez al final
     input("\nPresione Enter para continuar...")
 
+
 def imprimir_certificados():
-    id_buscar = input("ingrese ID a buscar\n")
-    encontrado = False # 1. Creamos la bandera
+    """Genera y muestra un certificado para un estudiante buscado por ID."""
+    limpiar_pantalla()
+    if not estudiantes:
+        print("No hay estudiantes registrados.")
+        input("\nPresione Enter para continuar...")
+        return
+
+    id_buscar = input("Ingrese ID a buscar para generar certificado:\n")
+    encontrado = False
 
     for estudiante in estudiantes:
         if id_buscar == estudiante[0]:
-            asistencia = random.randint(0, 100)
-            # Solo añadimos los datos si no existen ya para no duplicarlos
             if len(estudiante) == 3:
-                estudiante.append(asistencia)
-                notas = random.randint(1, 7)
-                estudiante.append(notas)
-                if asistencia < 70 or notas < 5:
-                    conducta = 'estudiante malo'
-                else:
-                    conducta = 'estudiante bueno'
-                estudiante.append(conducta)
-            
-            # Imprimimos los datos del certificado
-            print(f"NOMBRE: {estudiante[1]}")
-            print(f"NOTAS: {estudiante[4]}")       # Índice 4 para notas
-            print(f"ASISTENCIA: {estudiante[3]}")  # Índice 3 para asistencia
-            print(f"CONDUCTA: {estudiante[5]}")    # Índice 5 para conducta
+                asistencia = random.randint(70, 100)
+                notas = round(random.uniform(4.0, 7.0), 1)
+                conducta = 'Ejemplar' if notas >= 5.0 and asistencia >= 85 else 'Bueno'
+                estudiante.extend([asistencia, notas, conducta])
 
-            encontrado = True # 2. Cambiamos la bandera
-            break             # 3. Salimos del bucle
+            print("\n--- Certificado de Estudiante ---")
+            print(f"NOMBRE:     {estudiante[1]}")
+            print(f"ASISTENCIA: {estudiante[3]}%")
+            print(f"PROMEDIO:   {estudiante[4]}")
+            print(f"CONDUCTA:   {estudiante[5]}")
+            encontrado = True
+            break
 
-    # 4. DESPUÉS del bucle, revisamos si se encontró
     if not encontrado:
         print("Alumno no existe.")
 
-    # El input va al final de la función
     input("\nPresione Enter para continuar...")
-        
+
+
 def menu():
-    print("1) Registrar Estudiante ")
+    """Muestra el menú principal de opciones."""
+    print("\n===== SISTEMA DE GESTIÓN DE ESTUDIANTES =====")
+    print("1) Registrar Estudiante")
     print("2) Buscar Estudiante")
     print("3) Imprimir Certificados")
-    print("4) Descargar Archivo")
+    print("4) Descargar Reporte en CSV")
     print("5) Salir")
-    
+    print("=============================================")
+
+
 def descargar_archivo():
-    print("Descargar archivo")
-    #declarar inicio de archivo
-    with open('reporte_estudiantes.csv', mode = 'w', newline= '') as file:
-        #dar permisos de escritura
-        writer = csv.writer(file)
-        #crear la cabecera del documento
-        writer.writerow(["ID", "NOMBRE", "EDAD", "ASISTENCIA", "NOTA", "CONDUCTA"])
-        #PINTAR EL DOCUMENTO
-        for estudiante in estudiantes:
-            writer.writerow(estudiante)
-    #esto se leera desde la consola
-    print("archivo 'reporte_estudiantes.csv' creado exitosamente")
+    """Guarda los datos de todos los estudiantes en un archivo CSV."""
+    limpiar_pantalla()
+    if not estudiantes:
+        print("No hay estudiantes para exportar.")
+        input("\nPresione Enter para continuar...")
+        return
+        
+    nombre_archivo = 'reporte_estudiantes.csv'
+    cabecera = ["ID", "NOMBRE", "EDAD", "ASISTENCIA (%)", "NOTA PROMEDIO", "CONDUCTA"]
+
+    try:
+        with open(nombre_archivo, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(cabecera)
+
+            for estudiante in estudiantes:
+                if len(estudiante) < len(cabecera):
+                    fila_completa = list(estudiante)
+                    fila_completa.extend(['N/A'] * (len(cabecera) - len(estudiante)))
+                    writer.writerow(fila_completa)
+                else:
+                    writer.writerow(estudiante)
+
+        print(f"Archivo '{nombre_archivo}' creado exitosamente.")
+    except IOError:
+        print(f"Error: No se pudo escribir en el archivo '{nombre_archivo}'.")
+
+    input("\nPresione Enter para continuar...")
